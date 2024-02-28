@@ -12,13 +12,31 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import { useNavigate } from "react-router-dom";
 
-const pages = ["Products", "Pricing", "Blog"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const pages = [
+  { label: "Products", url: "/products" },
+  { label: "Pricing", url: "/pricing" },
+  { label: "Blog", url: "/blog" },
+];
+const settings = [
+  { label: "Profile", url: "/profile" },
+  { label: "Account", url: "/account" },
+  { label: "Dashboard", url: "/dashboard" },
+  { label: "Logout", url: "/logout" },
+];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const navigate = useNavigate();
+
+  const navigationHandler = (url) => {
+    handleCloseNavMenu();
+    handleCloseUserMenu();
+    navigate(url);
+  };
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -87,9 +105,9 @@ function ResponsiveAppBar() {
                 display: { xs: "block", md: "none" },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+              {pages.map((page, i) => (
+                <MenuItem key={i} onClick={() => navigationHandler(page.url)}>
+                  <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -114,13 +132,13 @@ function ResponsiveAppBar() {
             LOGO
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
+            {pages.map((page, i) => (
               <Button
-                key={page}
-                onClick={handleCloseNavMenu}
+                key={i}
+                onClick={() => navigationHandler(page.url)}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
-                {page}
+                {page.label}
               </Button>
             ))}
           </Box>
@@ -147,9 +165,12 @@ function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+              {settings.map((setting, i) => (
+                <MenuItem
+                  key={i}
+                  onClick={() => navigationHandler(setting.url)}
+                >
+                  <Typography textAlign="center">{setting.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
