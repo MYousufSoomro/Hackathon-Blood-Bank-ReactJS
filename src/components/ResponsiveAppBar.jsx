@@ -7,28 +7,35 @@ import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
+import BloodtypeIcon from "@mui/icons-material/Bloodtype";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { signOut } from "firebase/auth";
+import { auth } from "../config/firebase";
+import { setUserData } from "../config/store/slices/userData";
 
 const pages = [
-  { label: "Products", url: "/products" },
-  { label: "Pricing", url: "/pricing" },
-  { label: "Blog", url: "/blog" },
+  { label: "Home", url: "/" },
+  { label: "Donors", url: "/donors" },
+  { label: "Recipents", url: "/recipents" },
+  { label: "About", url: "/about" },
 ];
-const settings = [
-  { label: "Profile", url: "/profile" },
-  { label: "Account", url: "/account" },
-  { label: "Dashboard", url: "/dashboard" },
-  { label: "Logout", url: "/logout" },
-];
+// const settings = [
+//   { label: "Profile", url: "/profile" },
+//   { label: "Account", url: "/account" },
+//   { label: "Dashboard", url: "/dashboard" },
+//   { label: "Logout", url: "/logout" },
+// ];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const userData = useSelector((state) => state.userData);
+  const user = userData.isLoggedIn;
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
@@ -53,11 +60,24 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
+  const logoutHandler = () => {
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+        dispatch(setUserData(false));
+        navigate("/login");
+      })
+      .catch((error) => {
+        // An error happened.
+        console.log("error", error);
+      });
+  };
+
   return (
-    <AppBar position="static">
+    <AppBar color="error" position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+          <BloodtypeIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
@@ -73,7 +93,7 @@ function ResponsiveAppBar() {
               textDecoration: "none",
             }}
           >
-            LOGO
+            Blood Bank
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -110,9 +130,24 @@ function ResponsiveAppBar() {
                   <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
               ))}
+
+              {!user ? (
+                <>
+                  <MenuItem onClick={() => navigationHandler("/register")}>
+                    <Typography textAlign="center">Register</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={() => navigationHandler("/login")}>
+                    <Typography textAlign="center">Login</Typography>
+                  </MenuItem>
+                </>
+              ) : (
+                <MenuItem onClick={logoutHandler}>
+                  <Typography textAlign="center">Logout</Typography>
+                </MenuItem>
+              )}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+          <BloodtypeIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
@@ -129,7 +164,7 @@ function ResponsiveAppBar() {
               textDecoration: "none",
             }}
           >
-            LOGO
+            Blood Bank
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page, i) => (
@@ -141,9 +176,41 @@ function ResponsiveAppBar() {
                 {page.label}
               </Button>
             ))}
+
+            {!user ? (
+              <>
+                <Button
+                  onClick={() => navigationHandler("/register")}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  Register
+                </Button>
+                <Button
+                  onClick={() => navigationHandler("/login")}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  Login
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  onClick={() => navigationHandler("/profile")}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  Profile
+                </Button>
+                <Button
+                  onClick={logoutHandler}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  Logout
+                </Button>
+              </>
+            )}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
+          {/* <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
@@ -174,7 +241,7 @@ function ResponsiveAppBar() {
                 </MenuItem>
               ))}
             </Menu>
-          </Box>
+          </Box> */}
         </Toolbar>
       </Container>
     </AppBar>
